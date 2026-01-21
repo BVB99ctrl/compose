@@ -1,0 +1,29 @@
+services:
+  tor:
+    image: dperson/torproxy
+    container_name: tor
+    restart: unless-stopped
+    environment:
+      - LOCATION=FR
+      - TOR_MaxCircuitDirtiness=600
+    # On n'expose pas forcément les ports à l'hôte si seul le backend les utilise, 
+    # mais on les laisse comme demandé.
+    ports:
+      - "9050:9050"
+      - "9051:9051"
+
+  backend:
+    build: ./backend
+    container_name: backend
+    depends_on:
+      - tor
+    ports:
+      - "5000:5000"
+
+  frontend:
+    image: nginx:alpine
+    container_name: frontend
+    volumes:
+      - ./frontend/index.html:/usr/share/nginx/html/index.html
+    ports:
+      - "8080:80"

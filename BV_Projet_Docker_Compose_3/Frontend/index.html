@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utilisateurs Tor</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; }
+        .user-card {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 10px;
+            display: inline-block;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            background: #f9f9f9;
+        }
+        img { border-radius: 50%; border: 2px solid #ddd; width: 72px; height: 72px; background-color: #eee;}
+    </style>
+</head>
+<body>
+    <h1>Utilisateurs récupérés via Tor</h1>
+    <div id="users">Chargement...</div>
+
+    <script>
+        fetch('http://localhost:5000/api/users')
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('users');
+                container.innerHTML = data.results.map(user => {
+                    // On construit l'URL de notre proxy
+                    const proxiedImageUrl = `http://localhost:5000/api/proxy-image?url=${encodeURIComponent(user.picture.medium)}`;
+                    
+                    return `
+                        <div class="user-card">
+                            <img src="${proxiedImageUrl}" alt="Photo de ${user.name.first}">
+                            <p><strong>${user.name.first} ${user.name.last}</strong></p>
+                        </div>
+                    `;
+                }).join('');
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('users').innerHTML = "Erreur backend.";
+            });
+    </script>
+</body>
+</html>

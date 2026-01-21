@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple App</title>
+</head>
+<body>
+    <h1>Message du Backend :</h1>
+    <p id="message">Chargement...</p>
+
+    <script>
+        fetch('http://localhost:5000/api/hello')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('message').innerText = data.message;
+            })
+            .catch(error => {
+                document.getElementById('message').innerText = "Erreur de connexion au backend";
+                console.error('Erreur:', error);
+            });
+    </script>
+</body>
+</html>

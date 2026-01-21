@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Management</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        input { margin-bottom: 5px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+    <h2>User Management</h2>
+    <input type="text" id="username" placeholder="Username"><br>
+    <input type="password" id="password" placeholder="Password"><br>
+    <button onclick="createUser()">Add User</button>
+
+    <table id="userTable">
+        <thead>
+            <tr><th>ID</th><th>Username</th><th>Password</th><th>Actions</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const API_URL = 'http://localhost:5000/users';
+
+        async function fetchUsers() {
+            const res = await fetch(API_URL);
+            const users = await res.json();
+            const tbody = document.querySelector('#userTable tbody');
+            tbody.innerHTML = '';
+            users.forEach(user => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.username}</td>
+                        <td>${user.password}</td>
+                        <td>
+                            <button onclick="deleteUser(${user.id})">Delete</button>
+                            <button onclick="updateUser(${user.id})">Update</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        async function createUser() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            fetchUsers();
+        }
+
+        async function deleteUser(id) {
+            await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+            fetchUsers();
+        }
+
+        async function updateUser(id) {
+            const username = prompt("New username:");
+            const password = prompt("New password:");
+            if (username && password) {
+                await fetch(`${API_URL}/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                fetchUsers();
+            }
+        }
+
+        fetchUsers();
+    </script>
+</body>
+</html>
