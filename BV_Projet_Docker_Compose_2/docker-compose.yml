@@ -1,12 +1,16 @@
 services:
   backend:
     build: ./backend
-    ports:
-      - "5000:5000"
+    # On peut retirer 'ports' pour plus de sécurité, 
+    # le frontend y accède via le réseau interne Docker.
+    expose:
+      - "5000"
     volumes:
       - ./data:/app/data
-  
+
   frontend:
     build: ./frontend
     ports:
       - "8080:80"
+    depends_on:
+      - backend
