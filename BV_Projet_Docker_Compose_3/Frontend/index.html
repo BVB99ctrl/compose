@@ -24,21 +24,23 @@
     <div id="users">Chargement...</div>
 
     <script>
-        fetch('http://localhost:5000/api/users')
-            .then(res => res.json())
-            .then(data => {
-                const container = document.getElementById('users');
-                container.innerHTML = data.results.map(user => {
-                    // On construit l'URL de notre proxy
-                    const proxiedImageUrl = `http://localhost:5000/api/proxy-image?url=${encodeURIComponent(user.picture.medium)}`;
-                    
-                    return `
-                        <div class="user-card">
-                            <img src="${proxiedImageUrl}" alt="Photo de ${user.name.first}">
-                            <p><strong>${user.name.first} ${user.name.last}</strong></p>
-                        </div>
-                    `;
-                }).join('');
+// On remplace 'http://localhost:5000/api/users' par juste '/api/users'
+fetch('/api/users')
+    .then(res => res.json())
+    .then(data => {
+        const container = document.getElementById('users');
+        container.innerHTML = data.results.map(user => {
+            
+            // On utilise aussi le chemin relatif pour le proxy d'image
+            const proxiedImageUrl = `/api/proxy-image?url=${encodeURIComponent(user.picture.medium)}`;
+            
+            return `
+                <div class="user-card">
+                    <img src="${proxiedImageUrl}" alt="Photo de ${user.name.first}">
+                    <p><strong>${user.name.first} ${user.name.last}</strong></p>
+                </div>
+            `;
+        }).join('');
             })
             .catch(err => {
                 console.error(err);

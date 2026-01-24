@@ -1,21 +1,26 @@
-.PHONY: build up down logs ps
+# Variables
+COMPOSE = docker-compose
 
-# Lancer le projet
-up:
-	docker-compose up -d --build
+.PHONY: help up down restart logs ps clean
 
-# Arrêter le projet
-down:
-	docker-compose down
+help: ## Affiche cette aide
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-# Voir les logs (notamment pour vérifier l'IP de sortie Tor)
-logs:
-	docker-compose logs -f
+up: ## Lance les conteneurs en arrière-plan et construit si nécessaire
+	$(COMPOSE) up -d --build
 
-# Statut des conteneurs
-ps:
-	docker-compose ps
+down: ## Arrête et supprime les conteneurs
+	$(COMPOSE) down
 
-# Nettoyage complet
-clean:
-	docker-compose down --rmi all --volumes
+restart: ## Redémarre proprement tous les services
+	$(COMPOSE) down
+	$(COMPOSE) up -d --build
+
+logs: ## Affiche les logs de tous les services en continu
+	$(COMPOSE) logs -f
+
+ps: ## Affiche l'état des services
+	$(COMPOSE) ps
+
+clean: ## Nettoie tout : conteneurs, images et volumes non utilisés
+	$(COMPOSE) down --rmi all --volumes --remove-orphans

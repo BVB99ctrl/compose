@@ -2,28 +2,25 @@ services:
   tor:
     image: dperson/torproxy
     container_name: tor
-    restart: unless-stopped
     environment:
       - LOCATION=FR
       - TOR_MaxCircuitDirtiness=600
-    # On n'expose pas forcément les ports à l'hôte si seul le backend les utilise, 
-    # mais on les laisse comme demandé.
-    ports:
-      - "9050:9050"
-      - "9051:9051"
 
   backend:
     build: ./backend
     container_name: backend
     depends_on:
       - tor
-    ports:
-      - "5000:5000"
+    # On n'a plus besoin d'exposer le port 5000 au public !
+    # Seul Nginx y accédera en interne.
 
   frontend:
     image: nginx:alpine
     container_name: frontend
     volumes:
       - ./frontend/index.html:/usr/share/nginx/html/index.html
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
       - "8080:80"
+    depends_on:
+      - backend
