@@ -1,0 +1,14 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "PostgreSQL_Prod",
+            "Group": "Servers",
+            "Host": "database",
+            "Port": 5432,
+            "MaintenanceDB": "mypuddb",
+            "Username": "admin",
+            "SSLMode": "prefer",
+            "PassFile": "/tmp/pgpassfile"
+        }
+    }
+}

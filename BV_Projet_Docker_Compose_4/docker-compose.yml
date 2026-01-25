@@ -1,0 +1,47 @@
+services:
+  database:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    env_file: ./docker/postgres.env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./docker/backend.dockerfile
+    container_name: backend_app
+    env_file: ./docker/backend.env
+    depends_on:
+      - database
+    networks:
+      - app_network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./docker/frontend.dockerfile
+    container_name: frontend_app
+    env_file: ./docker/frontend.env
+    networks:
+      - app_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_ui
+    env_file: ./docker/pgadmin.env
+    volumes:
+      - ./docker/pgadmin_servers.json:/pgadmin4/servers.json
+    depends_on:
+      - database
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  db_data:
